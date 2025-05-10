@@ -22,16 +22,26 @@ import utilities.ConfigReader;
 import utilities.ReceipePojo;
 import utilities.DBConnection;
 
-public class LFV_Diet_ToAdd extends BaseClass {
+public class Nuts_Allergies extends BaseClass {
 
 	static WebDriver driver;
-	private static final Logger logger = LoggerFactory.getLogger(LFV_Diet_ToAdd.class);
+	private static final Logger logger = LoggerFactory.getLogger(Nuts_Allergies.class);
 
 	ConfigReader reader = new ConfigReader();
 	List<String> urls = new ArrayList<String>();
 	AdHandler ads = new AdHandler();
+	
+	List<String> excludeIngredients = Arrays.asList( "pork", "meat", "poultry", "fish", "sausage", "ham", "salami", "bacon", "milk", "cheese",
+	           "yogurt", "butter", "ice cream", "egg", "prawn", "oil", "olive oil", "coconut oil", "soybean oil",
+	            "corn oil", "safflower oil", "sunflower oil", "rapeseed oil", "peanut oil", "cottonseed oil",
+	            "canola oil", "mustard oil", "cereals", "tinned vegetable", "bread", "maida", "atta", "sooji", "poha",
+	            "cornflake", "cornflour", "pasta", "white rice", "pastry", "cakes", "biscuit", "soy", "soy milk",
+	            "white miso paste", "soy sauce", "soy curls", "edamame", "soy yogurt", "soy nut", "tofu", "pies",
+	            "chip", "cracker", "potatoe", "sugar", "jaggery", "glucose", "fructose", "corn syrup", "cane sugar",
+	            "aspartame", "cane solid", "maltose", "dextrose", "sorbitol", "mannitol", "xylitol", "maltodextrin",
+	            "molasses", "brown rice syrup", "splenda", "nutra sweet", "stevia", "barley malt"); 
 
-	List<String> LFV_ToAddIngredients = Arrays.asList("Butter", "ghee", "salmon", "mackerel", "sardines");
+	List<String> allergyIngredients = Arrays.asList("Peanuts", "walnut", "almond", "hazelnut", "pecan", "cashew", "pistachio", "Sesame");
 
 	@BeforeClass
 	public void setUp() throws InterruptedException {
@@ -160,9 +170,13 @@ public class LFV_Diet_ToAdd extends BaseClass {
 			logger.info("- " + text);
 			ingredients.add(text);
 
-			for (String ToAdd : LFV_ToAddIngredients) {
-				if (text.contains(ToAdd.toLowerCase())) {
-					logger.info("ToAdd recipe (contains Add ingredient: " + ToAdd + ")");
+			List<String> combinedFilters = new ArrayList<>();
+		    combinedFilters.addAll(allergyIngredients);
+		    combinedFilters.addAll(excludeIngredients);
+		    
+			for (String exclude : combinedFilters) {
+				if (text.contains(exclude.toLowerCase())) {
+					logger.info("Nuts Allergies recipe (contains excluded ingredient: " + exclude + ")");
 					return;
 				}
 			}
@@ -266,11 +280,13 @@ public class LFV_Diet_ToAdd extends BaseClass {
 		} catch (Exception e) {
 			recipe.recipe_description = " ";
 		}
+
 		logger.info("-----------------------------------");
 		String tablename = "nuts_allergies";
 
 	//	DBConnection.createTable(tablename);
 		DBConnection.insertRecipe(recipe, tablename);
+
 	}
 	
 
